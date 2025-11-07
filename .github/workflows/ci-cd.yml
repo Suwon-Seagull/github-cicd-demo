@@ -118,4 +118,4 @@ jobs:
           # --name: 컨테이너에 'github-cicd-app'이라는 고유한 이름을 부여
           # -p 80:8080: 서버의 80번 포트를 컨테이너의 8080 포트와 연결합니다. (예: http://서버IP/ 로 접속 가능)
           # --restart always: 예기치 않게 컨테이너가 종료되면 Docker가 자동으로 다시 시작시켜주는 옵션입니다.
-          docker run -d --restart always --name github-cicd-app -p 80:8080 ${{ secrets.DOCKER_USERNAME }}/github-cicd-demo:latest
+          docker run -d --restart always --name github-cicd-app -p 49080:8080 ${{ secrets.DOCKER_USERNAME }}/github-cicd-demo:latest
