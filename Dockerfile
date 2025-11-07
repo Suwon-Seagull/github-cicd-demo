@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Copy the Gradle wrapper files
 COPY gradlew .
-COPY gradle/wrapper/gradle-wrapper.jar gradle/wrapper/
+COPY gradle ./gradle
 
 # Copy the build scripts and settings
 COPY build.gradle settings.gradle ./
@@ -16,6 +16,7 @@ COPY src ./src
 
 # Build the application
 # This step will download dependencies and build the JAR
+RUN chmod +x ./gradlew
 RUN ./gradlew bootJar
 
 # Expose the port that Spring Boot runs on

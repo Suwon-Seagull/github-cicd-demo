@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.example.cicd'
 version = '0.0.1-SNAPSHOT'
-description = 'github-cicd-demoproject for Spring Boot'
+description = 'github-cicd-demo project for Spring Boot'
 
 java {
 	toolchain {
