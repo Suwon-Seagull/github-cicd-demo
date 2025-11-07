@@ -44,9 +44,27 @@
 
     1.  **실행 권한 부재:**
         -   **원인:** `Dockerfile`의 `COPY` 명령은 파일의 실행 권한을 보존하지 않음. 따라서 Docker 컨테이너 안의 `gradlew` 스크립트를 실행할 권한이 없었음.
-        -   **해결:** `RUN ./gradlew bootJar` 명령어 앞에 `RUN chmod +x ./gradlew`를 추가하여 실행 권한을 부여.
+        -   **해결:** `RUN chmod +x ./gradlew` 명령어를 추가하여 실행 권한을 부여.
 
     2.  **Gradle Wrapper 속성 파일 누락:**
         -   **원인:** `gradle-wrapper.properties` 파일이 `Dockerfile`에서 누락됨. 이 파일은 Gradle 버전을 지정하는 등 Wrapper 실행에 필수적임.
         -   **해결:** `COPY gradle/wrapper/gradle-wrapper.jar` 라인을 `COPY gradle ./gradle` 로 변경하여, `gradle` 디렉토리 전체를 복사하도록 수정.
+
+---
+
+### 4. 상태 페이지 빌드 정보 누락 (`version.properties not found`)
+
+-   **문제 현상:**
+    -   배포된 애플리케이션의 `/api/status` 엔드포인트에서 `version.properties not found` 오류 발생.
+
+-   **원인 분석:**
+    -   이전 방식(`createVersionProperties` 태스크)으로는 Docker 빌드 환경에서 `version.properties` 파일이 JAR에 제대로 포함되지 않음.
+    -   Docker 빌드 환경에는 `.git` 디렉토리가 없어 Git 커밋 해시를 자동으로 가져올 수 없음.
+
+-   **해결 조치:**
+    1.  **`build.gradle` 수정:** `spring-boot-starter-actuator` 의존성 추가 및 `springBoot { buildInfo() }` 설정.
+    2.  **`StatusController.java` 수정:** `BuildProperties` 객체를 주입받아 빌드 정보를 읽도록 변경.
+    3.  **`ci-cd.yml` 수정:** GitHub Actions의 `github.sha`를 Docker 빌드 인자(`COMMIT_ID`)로 전달.
+    4.  **`Dockerfile` 수정:** `ARG COMMIT_ID`를 선언하고 `gradlew bootJar -PcommitId=$COMMIT_ID`로 Gradle에 전달.
+    5.  **`build.gradle` 재수정:** `buildInfo` 설정에서 `project.findProperty('commitId')`를 사용하여 전달받은 커밋 해시를 `build-info.properties`에 포함.
 
