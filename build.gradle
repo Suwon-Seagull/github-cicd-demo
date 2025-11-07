@@ -36,3 +36,17 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// 빌드 시점에 'version.properties' 파일을 생성하는 태스크
+task createVersionProperties() {
+    doLast {
+        def propertiesFile = new File("$buildDir/resources/main/version.properties")
+        propertiesFile.parentFile.mkdirs()
+        // 빌드 시간과 커밋 해시(존재하는 경우)를 파일에 쓴다.
+        def commitHash = System.getenv("GITHUB_SHA") ?: "N/A"
+        propertiesFile.text = "build.time=${new Date().format('yyyy-MM-dd HH:mm:ss z')}\nbuild.commit=${commitHash}"
+    }
+}
+
+// 'processResources' 태스크가 실행되기 전에 'createVersionProperties' 태스크를 실행
+processResources.dependsOn createVersionProperties
